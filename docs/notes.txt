@@ -1,0 +1,50 @@
+/* 
+Los datos secretos son ocultados en n imágenes camuflaje. 
+Para la decodificación, se requieren al menos k (≤n) imágenes camuflajes para revelar los datos secretos
+
+El programa debe recibir como parámetros:1
+➢ d (distribuir) o bien r (recuperar)
+➢ imagenSecreta
+➢ número (k = 4,5,6)
+➢ directorio
+
+BMP: 
+8 bits por pixel
+Header 54B
+Agarrar el offset para saber dónde empieza el Body, no el header 
+img portadora e img secreta idem ancho y alto
+
+Módulos
+- manejo de archivos bmp --> agarrar la img, leer el offset y obtener pixeles 
+- operaciones en campos de Galois. 
+- Interpolación polinómica.
+- esquema propuesto con bloques pequeños (Por ej.: k = 4, n = 10, secreto de 60B)
+
+A tener en cuenta:
+- IMPORTANTE:
+Si dos portadoras en el bloque j tienen el mismo valor de X, debe modificarse, ya que si se
+generan dos sombras iguales no podrá luego resolverse el sistema.
+
+En caso de que lo anterior suceda, habrá que cambiar el X, sumándole 1, con la precaución de que
+al llegar al 255, se guarde 0 u otro valor conveniente.
+No hacer esta operación con GF(28), por lo siguiente:
+Si X está repetido, se hace X’ = X+1 (en GF(28))
+Si X’ vuelve a estar repetido, y se vuelve a hacer X” = X’+1 (en GF(28)) este X” termina siendo
+igual al primer valor X, porque la suma en GF(28) es un xor.
+
+- IMPORTANTE:
+Todas las operaciones se efectuarán en GF(28) usando el polinomio generador m(x) = x8+x6+x5+x1+1
+(que equivale al número 355)
+
+La división en GF(28) equivale a dividir por el inverso multiplicativo.
+Conviene tener una tabla generada con los inversos para proceder con mayor rapidez.
+
+- Otros:
++ Debe respetarse la sintaxis de ejecución del enunciado. Respetar incluso las mayúsculas y
+minúsculas.
+
++ utilizar EXIT_FAILURE y EXIT_SUCCESS de stdlib.h.
+
++ El programa debe explicitar errores. Por ejemplo, si hubo un error en un parámetro de entrada, se
+debe informar al usuario su error e informar la sintaxis correcta.
+*/ 
