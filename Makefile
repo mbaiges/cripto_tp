@@ -1,6 +1,8 @@
 # Compiler flags
 
-CFLAGS= -Werror -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-implicit-fallthrough -fsanitize=address \
+# extra: -Wno-unused-function -Wno-unused-parameter
+
+CFLAGS= -Werror -Wall -Wextra -Wno-implicit-fallthrough -fsanitize=address \
                 -pedantic -pedantic-errors -std=c11 -g \
                 $(MYCFLAGS)
 
@@ -33,14 +35,12 @@ C_UTILS_TEST_TARGET_CONTEXT= $(C_TEST_TARGET_CONTEXT)/utils
 
 # Outputs
 
-SS_OUT= ss
-SS_DEPS= $(C_UTILS_SOURCE_CONTEXT)/bmp_handler.c $(C_SOURCE_CONTEXT)/main.c 	
+SS_OUT = ss
+SS_DEPS = $(C_UTILS_SOURCE_CONTEXT)/bmp_handler.c $(C_SOURCE_CONTEXT)/main.c 	
 
 OUT= $(SS_OUT)
 
-all: test $(SS_OUT)
-
-ss: $(SS_OUT)
+all: $(SS_OUT)
 
 $(SS_OUT): $(SS_DEPS)
 	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CFLAGS)
@@ -48,17 +48,17 @@ $(SS_OUT): $(SS_DEPS)
 test: $(TEST_OUT)
 
 # TODO: Gotta fix this
-tests_check: $(TEST_OUT)
-	./$(BUFFER_TEST_OUT)
-	./$(PARSER_TEST_OUT)
+# tests_check: $(TEST_OUT)
+# 	./$(BUFFER_TEST_OUT)
+# 	./$(PARSER_TEST_OUT)
 
-$(BUFFER_TEST_OUT): $(BUFFER_TEST_DEPS)
-	@mkdir -p $(C_UTILS_TEST_TARGET_CONTEXT)	
-	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CTESTFLAGS)
+# $(BUFFER_TEST_OUT): $(BUFFER_TEST_DEPS)
+# 	@mkdir -p $(C_UTILS_TEST_TARGET_CONTEXT)	
+# 	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CTESTFLAGS)
 	
-$(PARSER_TEST_OUT): $(PARSER_TEST_DEPS)
-	@mkdir -p $(C_UTILS_TEST_TARGET_CONTEXT)	
-	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CTESTFLAGS)
+# $(PARSER_TEST_OUT): $(PARSER_TEST_DEPS)
+# 	@mkdir -p $(C_UTILS_TEST_TARGET_CONTEXT)	
+# 	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CTESTFLAGS)
 
 clean:
 	rm -f $(OUT)

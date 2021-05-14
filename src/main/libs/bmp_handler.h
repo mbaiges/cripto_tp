@@ -1,21 +1,38 @@
 #ifndef _BMP_HANDLER_H
 #define _BMP_HANDLER_H
 
-#include <stdin.h>
+#include <stdlib.h>
+#include <stdint.h>
 
-#define BMP_HEADER_SIZE 54
+struct BMP_header {
+    char file_signature[2];             // The characters ‘B’ and ‘M’
+    uint8_t file_size[4];                 // Size in bytes of the file including headers and pixel data
+    uint8_t reserved[4];                // Unused
+    uint32_t data_offset;               // Offset in the file where the pixel data is stored
+    uint32_t header_size;               // The header is fixed size: 40 bytes
+    uint32_t image_width;               // Width of the image in pixels
+    uint32_t image_height;              // Height of the image in pixels
+    uint16_t image_color_planes;        // Number of color planes (must be 1)
+    uint16_t image_bpp;                 // Number of bits per pixel
+    uint32_t image_compression;         // Compression method
+    uint32_t image_size;                // Can be 0 if image is not compressed, otherwise is the size of the compressed image
+    uint32_t image_pixels_per_meter_X;  // Horizontal resolution in pixels per meter
+    uint32_t image_pixels_per_meter_Y;  // Vertical resolution in pixels per meter
+    uint32_t image_colors_used;         // Number used colors
+    uint32_t image_important_colors;    // Number of important color. Can be 0 If all colors are important
+};
 
-typedef struct * image_composition {
-    uint8_t * header;
-    uint8_t * pixels;
+typedef struct image_composition {
+    struct BMP_header header;
     size_t pixels_size;
+    uint8_t * pixels;
 } image_composition;
 
-typedef struct * xwvu {
+typedef struct xwvu {
     uint8_t x;
     uint8_t w;
     uint8_t v;
-    uint8_t u;  
+    uint8_t u;
 } xwvu;
 
 /**
