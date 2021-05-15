@@ -1,12 +1,24 @@
+#include <stdlib.h>
+
 #include <bmp_handler.h>
-#include <stdio.h>
 
 int main(int argc, char ** argv) {
-    printf("argc=%d, argv[0]=%s", argc, argv[0]);
 
     image_composition img_comp;
 
-    load_image("images/Albert.bmp", &img_comp);
+    int res;
 
-    return 0;
+    res = load_image("images/Albert.bmp", &img_comp);
+    if (res != 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    res = save_image("images/Albertito.bmp", &img_comp);
+    if (res != 0) {
+        exit(EXIT_FAILURE);
+    }
+
+    free_image_composition(&img_comp);
+
+    exit(EXIT_SUCCESS);
 }

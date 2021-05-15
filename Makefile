@@ -1,8 +1,8 @@
 # Compiler flags
 
-# extra: -Wno-unused-function -Wno-unused-parameter
+# extra: -Werror
 
-CFLAGS= -Werror -Wall -Wextra -Wno-implicit-fallthrough -fsanitize=address \
+CFLAGS= -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-function -Wno-unused-parameter -fsanitize=address \
                 -pedantic -pedantic-errors -std=c11 -g \
                 $(MYCFLAGS)
 
