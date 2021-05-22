@@ -46,12 +46,12 @@ int load_image(const char * filename, image_composition * img_comp);
 
 /**
 Loads an image given by the user
-@directory: path of the directory containing images
+@filenames: array of filenames
 @imgs_comp: array of struct pointers where image info will be stored
 @imgs_comp_size: array returned size
 @output: returns 0 if no error
 **/ 
-int load_images(const char * directory, image_composition ** imgs_comp, size_t * imgs_comp_size);
+int load_images(char ** filenames, image_composition ** imgs_comp, size_t * imgs_comp_size);
 
 /**
 Saves an image given by the user 
@@ -63,12 +63,12 @@ int save_image(const char * filename, image_composition * img_comp);
 
 /**
 Loads an image given by the user
-@directory: path of the directory containing images
+@filenames: array of filenames
 @imgs_comp: array of struct pointers where image info will be stored
 @imgs_comp_size: array returned size
 @output: returns 0 if no error
 **/ 
-int save_images(const char * directory, image_composition ** imgs_comp, size_t * imgs_comp_size);
+int save_images(char ** filenames, image_composition ** imgs_comp, size_t imgs_comp_size);
 
 /**
 Divides pixels matrix into 2x2 XWVU arrays
@@ -76,9 +76,11 @@ Divides pixels matrix into 2x2 XWVU arrays
 @pixels_size: number of pixels 
 @xwvu_array: xwvu array 
 @wxvu_array_size: size of the xwvu array
+@width: image width (pixels)
+@height: image height (pixels)
 @output: returns 0 if no error
 **/   
-int pixels_to_xwvu(uint8_t * pixels, size_t pixels_size, xwvu * xwvu_array, size_t * xwvu_array_size);
+int pixels_to_xwvu(uint8_t * pixels, size_t pixels_size, xwvu ** xwvu_array, size_t * xwvu_array_size, size_t width, size_t height);
 
 /**
 Divides 2x2 XWVU arrays into pixels array
@@ -86,9 +88,11 @@ Divides 2x2 XWVU arrays into pixels array
 @pixels_size: number of pixels 
 @xwvu_array: xwvu array 
 @wxvu_array_size: size of the xwvu array
+@width: image width (pixels)
+@height: image height (pixels)
 @output: returns 0 if no error
 **/   
-int xwvu_to_pixels(xwvu * xwvu_array, size_t xwvu_array_size, uint8_t * pixels, size_t * pixels_size);
+int xwvu_to_pixels(xwvu * xwvu_array, size_t xwvu_array_size, uint8_t ** pixels, size_t * pixels_size, size_t width, size_t height);
 
 /**
 Frees image composition loaded
@@ -100,7 +104,7 @@ void free_image_composition(image_composition * img_comp);
 Frees images composition loaded
 @imgs_comp: array of struct pointers where images info are stored
 **/ 
-void free_images_composition(image_composition ** imgs_comp);
+void free_images_composition(image_composition ** imgs_comp, size_t * imgs_comp_size);
 
 /**
 Free xwvu array

@@ -35,7 +35,7 @@ void print_image(uint8_t * pixels, unsigned int width, unsigned int height) {
     int j = 0;
 
     for (int it = (width*height)-1; it >= 0 ; it--) {
-        i = width - (it / width) - 1;
+        i = height - (it / width) - 1;
         j = it % width;
         
         if (pixels[it] > (1<<7)) { // si el pixel está por encima de 128 (2^7)
@@ -107,6 +107,15 @@ int load_image(const char * filename, image_composition * img_comp) {
     return 0;
 }
 
+int load_images(char ** filenames, image_composition ** imgs_comp, size_t * imgs_comp_size) {
+    // for(size_t i = 0 ; i < imgs_comp_size ; i++) {
+    //     if (load_image(filename[i], imgs_comp[i]) != 0) 
+    //         return -1;
+    // }
+
+    return 0;
+}
+
 int save_image(const char * filename, image_composition * img_comp) {
     
     FILE *fp;
@@ -147,11 +156,108 @@ int save_image(const char * filename, image_composition * img_comp) {
     return 0;
 }
 
-void free_pixels_array(uint8_t * pixels) {
-    free(pixels);
+int save_images(char ** filenames, image_composition ** imgs_comp, size_t imgs_comp_size) {
+    for(size_t i = 0 ; i < imgs_comp_size ; i++) {
+        if (save_image(filenames[i], imgs_comp[i]) != 0)
+            return -1;
+    }
+
+    return 0;
+}
+
+int pixels_to_xwvu(uint8_t * pixels, size_t pixels_size, xwvu ** xwvu_array, size_t * xwvu_array_size, size_t width, size_t height) {
+
+    uint8_t matrix[height][width];
+
+    int i = 0;
+    int j = 0;
+
+    for (int it = (width*height)-1; it >= 0 ; it--) {
+        i = height - (it / width) - 1;
+        j = it % width;
+
+        matrix[i][j] = pixels[it];
+    }
+
+    *xwvu_array_size = (width*height)/4;
+
+    *xwvu_array = malloc(*xwvu_array_size * sizeof(xwvu));
+
+    int rows = (int) height;
+    int cols = (int) width;
+
+    uint8_t * row1, * row2;
+    
+    int k = 0;
+    for (int i=0; i < rows; i+=2 ){
+        row1 = matrix[i];   //42 43 44 45 46 47
+        row2 = matrix[i+1]; //36 37 38 39 40 41
+        
+        for(int j = 0; j < cols; j+=2){
+
+            (*xwvu_array)[k].x = row1[j];
+            (*xwvu_array)[k].w = row1[j+1];
+            (*xwvu_array)[k].v = row2[j];
+            (*xwvu_array)[k].u = row2[j+1];
+
+            // xwvu_array[k] = [42,43,36,37]
+            k++;
+        }
+    }
+
+    return 0;
+}
+
+int xwvu_to_pixels(xwvu * xwvu_array, size_t xwvu_array_size, uint8_t ** pixels, size_t * pixels_size, size_t width, size_t height) {
+
+    int new_pixels_size = xwvu_array_size*4;
+    int row, col;
+    
+    int rows = (int) height/2;
+    int cols = (int) width/2;
+
+    *pixels = malloc(new_pixels_size * sizeof(uint8_t));
+
+    for (int i=0; i < (int) xwvu_array_size; i++) {
+        row = i / cols;
+        col = i % cols;
+
+        //  col = 0            col = 1          col = 2
+
+        //  i = 0              i = 1          i = 2      --- row = 0 (que tiene la original_row 0 y 1)
+        // [[42,43,36,37], [44,45,38,39], [46,47,40,41], --> width/2 = cols
+        //    x w  v  u 
+        // 42,4344,45  46,47
+        // 36,37  38,39  40,41 
+        //  i = 3              i = 4          i = 5      --- row = 1
+        // [30,31,24,25], [32,33,26,27], [34,35,28,29]
+
+        (*pixels)[((2*rows - 2*row - 1) - 0) * 2*cols + (2*col + 0)] = xwvu_array[i].x;
+        (*pixels)[((2*rows - 2*row - 1) - 0) * 2*cols + (2*col + 1)] = xwvu_array[i].w;
+        (*pixels)[((2*rows - 2*row - 1) - 1) * 2*cols + (2*col + 0)] = xwvu_array[i].v;
+        (*pixels)[((2*rows - 2*row - 1) - 1) * 2*cols + (2*col + 1)] = xwvu_array[i].u;
+    }
+
+    *pixels_size = new_pixels_size;
+    
+    return 0;
 }
 
 void free_image_composition(image_composition * img_comp) {
     free_pixels_array(img_comp->pixels);
     free(img_comp->fill);
+}
+
+void free_images_composition(image_composition ** imgs_comp, size_t * imgs_comp_size) {
+    for (int i=0; i < (int) *imgs_comp_size; i++) {
+        free_image_composition(imgs_comp[i]);
+    }
+}
+
+void free_xwvu_array(xwvu * xwvu_array) {
+    free(xwvu_array);
+}
+
+void free_pixels_array(uint8_t * pixels) {
+    free(pixels);
 }
