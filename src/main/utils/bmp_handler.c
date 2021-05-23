@@ -232,10 +232,17 @@ int xwvu_to_pixels(xwvu * xwvu_array, size_t xwvu_array_size, uint8_t ** pixels,
         //  i = 3              i = 4          i = 5      --- row = 1
         // [30,31,24,25], [32,33,26,27], [34,35,28,29]
 
+        /*
         (*pixels)[((2*rows - 2*row - 1) - 0) * 2*cols + (2*col + 0)] = xwvu_array[i].x;
         (*pixels)[((2*rows - 2*row - 1) - 0) * 2*cols + (2*col + 1)] = xwvu_array[i].w;
         (*pixels)[((2*rows - 2*row - 1) - 1) * 2*cols + (2*col + 0)] = xwvu_array[i].v;
         (*pixels)[((2*rows - 2*row - 1) - 1) * 2*cols + (2*col + 1)] = xwvu_array[i].u;
+        */
+
+        (*pixels)[(2*(rows - row) - 1) * 2*cols + 2*col] = xwvu_array[i].x;
+        (*pixels)[(2*(rows - row) - 1) * 2*cols + (2*col + 1)] = xwvu_array[i].w;
+        (*pixels)[((2*(rows - row) - 1) - 1) * 2*cols + 2*col] = xwvu_array[i].v;
+        (*pixels)[((2*(rows - row) - 1) - 1) * 2*cols + (2*col + 1)] = xwvu_array[i].u;
     }
 
     *pixels_size = new_pixels_size;
