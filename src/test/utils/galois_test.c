@@ -20,9 +20,10 @@ uint8_t gmul_russian(uint8_t a, uint8_t b) {
 
 START_TEST(galois_mult_matrix_test)
 {
-   
-    for (unsigned int x=0; x<256; x++) {
-        for (unsigned int y=0; y<256; y++) {
+    uint8_t ans1, ans2;
+
+    for (unsigned int x=1; x<256; x++) {
+        for (unsigned int y=1; y<256; y++) {
             ans1 = gmul(x, y); // table 
             ans2 = gmul_russian(x, y); //ruso
 

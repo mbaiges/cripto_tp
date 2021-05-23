@@ -22,11 +22,11 @@ def gmul(a, b):
 
 s = 'mult={'
 
-for x in range(0, 1<<8):
+for x in range(1, 1<<8):
     
     s += '{'
     
-    for y in range(0, 1<<8):
+    for y in range(1, 1<<8):
       
         res = gmul(x, y)
 

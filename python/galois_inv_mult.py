@@ -30,16 +30,13 @@ def gf_invert(a, mod=0x163) :
 
 s = 'inv_mult={'
 
-for x in range(0, 1<<8):
+for x in range(1, 1<<8):
 
-    if x == 0:
-        s += '0, '
-    else:
-        inv_x = gf_invert(x)
+    inv_x = gf_invert(x)
 
-        s += f'{inv_x}'
-        if x < (1<<8) - 1:
-            s += ', '
+    s += f'{inv_x}'
+    if x < (1<<8) - 1:
+        s += ', '
 
 s += '};'
 
