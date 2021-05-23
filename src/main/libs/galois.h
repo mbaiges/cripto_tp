@@ -3,27 +3,17 @@
 
 #include <stdint.h>
 
-typedef struct mult_table {
-    uint8_t mult[1<<8][1<<8]; // 256 * 256 TODO: create TABLE :/ 
-} mult_table;
+/* Add two numbers in the GF(2^8) finite field */
+uint8_t gadd(uint8_t a, uint8_t b);
 
-// Polynomial generator g(x)
-static const uint8_t g = {1, 0, 0, 0, 1, 1, 0, 1}; // 1 + x + x^5 + x^6 + x^8
+/* Multiply two numbers in the GF(2^8) finite field */
+uint8_t gmul(uint8_t a, uint8_t b);
 
-/**
-Generates F(x) with random coefs  
-@poly: Stores the polynomial
-@output: returns 0 if no error
-**/ 
-int get_random_poly(uint8_t ** poly);
+/* Substract two numbers in the GF(2^8) finite field */
+uint8_t gsub(uint8_t a, uint8_t b);
 
-/**
-F(x) mod g(x) 
-@n:  numbers to multiply (1)
-@m:  numbers to multiply (2)
-@output: result
-**/ 
-uint8_t multiply(uint8_t n, uint8_t m);
+/* Divide two numbers in the GF(2^8) finite field */
+uint8_t gdiv(uint8_t a, uint8_t b);
 
 /**
 Evaluates F(x)  
@@ -32,12 +22,6 @@ Evaluates F(x)
 @result: result
 @output: returns 0 if no error
 **/ 
-int poly_eval( uint8_t * poly, uint8_t x, uint8_t * result);
-
-/**
-Frees F(x) 
-@poly: F(x)  
-**/ 
-void free_poly(uint8_t * poly);
+int poly_eval(uint8_t * poly, uint8_t k, uint8_t x, uint8_t * result);
 
 #endif

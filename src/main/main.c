@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <galois.h>
 
 #include <bmp_handler.h>
 
