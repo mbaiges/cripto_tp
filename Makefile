@@ -56,6 +56,7 @@ test: $(TEST_OUT)
 tests_check: $(TEST_OUT)
 	./$(BMP_TEST_OUT)
 	./$(GALOIS_TEST_OUT)
+	./$(POLYNOMIAL_TEST_OUT)
 
 $(BMP_TEST_OUT): $(BMP_TEST_DEPS)
 	@mkdir -p $(C_UTILS_TEST_TARGET_CONTEXT)	
