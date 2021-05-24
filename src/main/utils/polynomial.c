@@ -76,6 +76,10 @@ int poly_div_scalar(uint8_t * poly, size_t poly_g, uint8_t scalar, uint8_t * res
     return 0;
 }
 
+int poly_eval(uint8_t * poly, size_t poly_g, uint8_t x, uint8_t * result) {
+    return 0;
+}
+
 int lagrange_interpolate(uint8_t tuples[][2], size_t k, uint8_t * poly) {
     
     setvbuf(stdout, NULL, _IONBF, 0);
@@ -119,7 +123,7 @@ int lagrange_interpolate(uint8_t tuples[][2], size_t k, uint8_t * poly) {
                 poly_aux1[0] = x_j; // sumar es restar (x - x_j)
                 poly_aux1[1] = 1;
 
-                divisor = gadd(x_i, x_j); // sumar es restar (x_i - x_j)
+                divisor = gsub(x_i, x_j);
                 
                 res = poly_div_scalar(poly_aux1, 2, divisor, poly_aux2);
                 if (res != 0) {

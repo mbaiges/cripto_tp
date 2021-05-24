@@ -30,6 +30,7 @@ int poly_mult(uint8_t * poly1, size_t poly1_g, uint8_t * poly2, size_t poly2_g, 
 Polynomial scalar multiplication
 @poly: polynomial
 @poly_g: polynomial grade 
+@scalar: scalar
 @result: result polynomial 
 @output: returns 0 if no error
 **/ 
@@ -39,10 +40,21 @@ int poly_mult_scalar(uint8_t * poly, size_t poly_g, uint8_t scalar, uint8_t * re
 Polynomial scalar division
 @poly: polynomial
 @poly_g: polynomial grade 
+@scalar: scalar
 @result: result polynomial 
 @output: returns 0 if no error
 **/ 
 int poly_div_scalar(uint8_t * poly, size_t poly_g, uint8_t scalar, uint8_t * result);
+
+/**
+Polynomial scalar division
+@poly: polynomial
+@poly_g: polynomial grade 
+@x: x to eval
+@result: result of polynomial eval 
+@output: returns 0 if no error
+**/ 
+int poly_eval(uint8_t * poly, size_t poly_g, uint8_t x, uint8_t * result);
 
 /**
 Lagrange interpolation for secret reconstruction in GF(2^8)
