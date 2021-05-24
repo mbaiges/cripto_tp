@@ -6,7 +6,7 @@ CFLAGS= -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-function -Wno-unused
                 -pedantic -pedantic-errors -std=c11 -g \
                 $(MYCFLAGS)
 
-CTESTFLAGS= -lcheck -lm -lrt -lsubunit -pthread -D_POSIX_C_SOURCE=200112L $(CFLAGS) $(MYCFLAGS)
+CTESTFLAGS= -lcheck -lm -lrt -lsubunit -pthread $(CFLAGS) $(MYCFLAGS)
 
 # Context
 
@@ -33,12 +33,15 @@ BMP_TEST_DEPS= $(C_UTILS_TEST_SOURCE_CONTEXT)/bmp_handler_test.c
 GALOIS_TEST_OUT= $(C_UTILS_TEST_TARGET_CONTEXT)/galois_test
 GALOIS_TEST_DEPS= $(C_UTILS_TEST_SOURCE_CONTEXT)/galois_test.c
 
-TEST_OUT= $(BMP_TEST_OUT) $(GALOIS_TEST_OUT)
+POLYNOMIAL_TEST_OUT= $(C_UTILS_TEST_TARGET_CONTEXT)/polynomial_test
+POLYNOMIAL_TEST_DEPS= $(C_UTILS_TEST_SOURCE_CONTEXT)/polynomial_test.c
+
+TEST_OUT= $(BMP_TEST_OUT) $(GALOIS_TEST_OUT) $(POLYNOMIAL_TEST_OUT)
 
 # Outputs
 
 SS_OUT = $(C_TARGET_CONTEXT)/ss
-SS_DEPS = $(C_UTILS_SOURCE_CONTEXT)/bmp_handler.c $(C_UTILS_SOURCE_CONTEXT)/galois.c $(C_SOURCE_CONTEXT)/main.c 	
+SS_DEPS = $(C_UTILS_SOURCE_CONTEXT)/polynomial.c $(C_UTILS_SOURCE_CONTEXT)/bmp_handler.c $(C_UTILS_SOURCE_CONTEXT)/galois.c $(C_SOURCE_CONTEXT)/main.c 	
 
 OUT= $(SS_OUT) $(TEST_OUT)
 
@@ -59,6 +62,10 @@ $(BMP_TEST_OUT): $(BMP_TEST_DEPS)
 	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CTESTFLAGS)
 
 $(GALOIS_TEST_OUT): $(GALOIS_TEST_DEPS)
+	@mkdir -p $(C_UTILS_TEST_TARGET_CONTEXT)	
+	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CTESTFLAGS)
+
+$(POLYNOMIAL_TEST_OUT): $(POLYNOMIAL_TEST_DEPS)
 	@mkdir -p $(C_UTILS_TEST_TARGET_CONTEXT)	
 	$(CC) -o $@ $^ -I $(C_SOURCE_CONTEXT)/libs $(CTESTFLAGS)
 

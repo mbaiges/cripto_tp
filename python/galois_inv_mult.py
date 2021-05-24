@@ -1,4 +1,4 @@
-def gf_degree(a) :
+def gf_degree(a):
     res = 0
     a >>= 1
     while (a != 0) :
