@@ -4,11 +4,11 @@
 #include "../../main/utils/polynomial.c"
 #include "../../main/utils/galois.c"
 
-static uint16_t g = 0x163;
+static uint16_t POLY_GEN = 0x163;
 
 START_TEST(test_polynomial_addition)
 {
-    galois_init(g);
+    galois_init(POLY_GEN);
 
     uint8_t poly_res[10] = {0};
  
@@ -33,7 +33,7 @@ END_TEST
 
 START_TEST(test_polynomial_multiplication_by_scalar)
 {
-    galois_init(g);
+    galois_init(POLY_GEN);
 
     uint8_t poly1[] = {0, 0, 4, 0, 200, 0, 5};
     uint8_t scalar = 2;
@@ -58,7 +58,7 @@ END_TEST
 
 START_TEST(test_polynomial_division_by_scalar)
 {
-    galois_init(g);
+    galois_init(POLY_GEN);
 
     uint8_t poly1[] = {0, 0, 8, 0, 243, 0, 10};
     uint8_t scalar = 2;
@@ -83,7 +83,7 @@ END_TEST
 
 START_TEST(test_polynomial_multiplication)
 {
-    galois_init(g);
+    galois_init(POLY_GEN);
 
     uint8_t poly_res[10] = {0};
  
@@ -106,26 +106,61 @@ START_TEST(test_polynomial_multiplication)
 }
 END_TEST
 
-START_TEST(test_polynomial_lagrange_interpolation)
+START_TEST(test_polynomial_eval)
 {
-    galois_init(g);
+    galois_init(POLY_GEN);
 
-    uint8_t poly_res[3] = {0};
+    uint8_t poly_res = 0;
 
-    uint8_t tuples[][2] = {{1,0}, {2,14}, {3,10}};
+    uint8_t poly[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    uint8_t x = 5;
 
-    uint8_t expected_poly[] = {1, 2, 3};
+    uint8_t expected_y = 203;
 
     int res;
 
-    res = lagrange_interpolate(tuples, 3, poly_res);
+    res = poly_eval(poly, sizeof(poly)/sizeof(poly[0]), x, &poly_res);
+    
+    ck_assert_uint_eq(0, res);
+    ck_assert_uint_eq(expected_y, poly_res);
+
+    uint8_t poly2_res = 0;
+
+    uint8_t poly2[] = {8, 3, 0, 1, 220, 255, 188, 101};
+    uint8_t x2 = 254;
+
+    uint8_t expected_y2 = 102;
+
+    int res2;
+
+    res2 = poly_eval(poly2, sizeof(poly2)/sizeof(poly2[0]), x2, &poly2_res);
+    
+    ck_assert_uint_eq(0, res2);
+    ck_assert_uint_eq(expected_y2, poly2_res);
+}
+END_TEST
+
+START_TEST(test_polynomial_lagrange_interpolation)
+{
+    galois_init(POLY_GEN);
+
+    uint8_t poly[] = {20, 40, 60};
+    uint8_t x[] = {100, 200, 20};
+
+    uint8_t y[] = {123, 90, 238};
+
+    uint8_t poly_res[3] = {0};
+
+    int res;
+
+    res = lagrange_interpolate(x, y, 3, poly_res);
     
     ck_assert_uint_eq(0, res);
 
     size_t poly_res_size = 3;
 
     for(size_t i = 0; i < poly_res_size; i++){
-        ck_assert_uint_eq(expected_poly[i], poly_res[i]);
+        ck_assert_uint_eq(poly[i], poly_res[i]);
     }
 }
 END_TEST
@@ -140,6 +175,7 @@ suite(void)
     tcase_add_test(tc, test_polynomial_multiplication_by_scalar);
     tcase_add_test(tc, test_polynomial_division_by_scalar);
     tcase_add_test(tc, test_polynomial_multiplication);
+    tcase_add_test(tc, test_polynomial_eval);
     tcase_add_test(tc, test_polynomial_lagrange_interpolation);
     suite_add_tcase(s, tc);
 

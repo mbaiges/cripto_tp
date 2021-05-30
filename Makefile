@@ -1,9 +1,9 @@
 # Compiler flags
 
 # extra: 
-
+# -fsanitize=address
 CFLAGS= -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-function -Wno-unused-parameter -fsanitize=address \
-                -pedantic -pedantic-errors -std=c11 -g \
+                -pedantic -pedantic-errors -std=c99 -D_DEFAULT_SOURCE -g \
                 $(MYCFLAGS)
 
 CTESTFLAGS= -lcheck -lm -lrt -lsubunit -pthread $(CFLAGS) $(MYCFLAGS)
@@ -41,7 +41,7 @@ TEST_OUT= $(BMP_TEST_OUT) $(GALOIS_TEST_OUT) $(POLYNOMIAL_TEST_OUT)
 # Outputs
 
 SS_OUT = $(C_TARGET_CONTEXT)/ss
-SS_DEPS = $(C_UTILS_SOURCE_CONTEXT)/polynomial.c $(C_UTILS_SOURCE_CONTEXT)/bmp_handler.c $(C_UTILS_SOURCE_CONTEXT)/galois.c $(C_SOURCE_CONTEXT)/main.c 	
+SS_DEPS = $(C_UTILS_SOURCE_CONTEXT)/secret.c $(C_UTILS_SOURCE_CONTEXT)/arguments.c $(C_UTILS_SOURCE_CONTEXT)/polynomial.c $(C_UTILS_SOURCE_CONTEXT)/bmp_handler.c $(C_UTILS_SOURCE_CONTEXT)/galois.c $(C_SOURCE_CONTEXT)/main.c 	
 
 OUT= $(SS_OUT) $(TEST_OUT)
 

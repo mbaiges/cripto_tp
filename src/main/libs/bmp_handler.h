@@ -1,6 +1,8 @@
 #ifndef _BMP_HANDLER_H
 #define _BMP_HANDLER_H
 
+#define MAX_FILEPATH_LENGTH 512
+
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -23,8 +25,9 @@ struct BMP_header {
 };
 
 typedef struct image_composition {
+    char filepath[MAX_FILEPATH_LENGTH];
     struct BMP_header header;
-    uint8_t * fill;  // Between offset and header 
+    uint8_t * colors_table;  // Between offset and header 
     uint8_t * pixels;
     size_t pixels_size;
 } image_composition;
@@ -38,20 +41,20 @@ typedef struct xwvu {
 
 /**
 Loads an image given by the user 
-@filename: path of the image
+@filepath: path of the image
 @img_comp: struct pointer where image info will be stored
 @output: returns 0 if no error
 **/ 
-int load_image(const char * filename, image_composition * img_comp);
+int load_image(const char * filepath, image_composition * img_comp);
 
 /**
 Loads an image given by the user
-@filenames: array of filenames
+@directory: directory of images
 @imgs_comp: array of struct pointers where image info will be stored
 @imgs_comp_size: array returned size
 @output: returns 0 if no error
 **/ 
-int load_images(char ** filenames, image_composition ** imgs_comp, size_t * imgs_comp_size);
+int load_images(char * directory, image_composition ** imgs_comp, size_t * imgs_comp_size);
 
 /**
 Saves an image given by the user 
@@ -59,16 +62,15 @@ Saves an image given by the user
 @img_comp: struct pointer where image info is stored
 @output: returns 0 if no error
 **/ 
-int save_image(const char * filename, image_composition * img_comp);
+int save_image(image_composition * img_comp);
 
 /**
 Loads an image given by the user
-@filenames: array of filenames
 @imgs_comp: array of struct pointers where image info will be stored
 @imgs_comp_size: array returned size
 @output: returns 0 if no error
 **/ 
-int save_images(char ** filenames, image_composition ** imgs_comp, size_t imgs_comp_size);
+int save_images(image_composition * imgs_comp, size_t imgs_comp_size);
 
 /**
 Divides pixels matrix into 2x2 XWVU arrays
@@ -104,7 +106,7 @@ void free_image_composition(image_composition * img_comp);
 Frees images composition loaded
 @imgs_comp: array of struct pointers where images info are stored
 **/ 
-void free_images_composition(image_composition ** imgs_comp, size_t * imgs_comp_size);
+void free_images_composition(image_composition * imgs_comp, size_t imgs_comp_size);
 
 /**
 Free xwvu array

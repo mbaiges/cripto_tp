@@ -47,7 +47,7 @@ Polynomial scalar division
 int poly_div_scalar(uint8_t * poly, size_t poly_g, uint8_t scalar, uint8_t * result);
 
 /**
-Polynomial scalar division
+Polynomial evaluation
 @poly: polynomial
 @poly_g: polynomial grade 
 @x: x to eval
@@ -58,11 +58,12 @@ int poly_eval(uint8_t * poly, size_t poly_g, uint8_t x, uint8_t * result);
 
 /**
 Lagrange interpolation for secret reconstruction in GF(2^8)
-@tuples: shadows to interpolate  
+@x: x from shadows
+@y: f(x) from shadows  
 @k: number of shadows
 @poly: answer coefs
 @output: returns 0 if no error
 **/ 
-int lagrange_interpolate(uint8_t tuples[][2], size_t k, uint8_t * poly);
+int lagrange_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly);
 
 #endif

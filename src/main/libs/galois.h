@@ -18,13 +18,4 @@ uint8_t gsub(uint8_t a, uint8_t b);
 /* Divide two numbers in the GF(2^8) finite field */
 uint8_t gdiv(uint8_t a, uint8_t b);
 
-/**
-Evaluates F(x)  
-@poly: F(x) coefs
-@x: Number to evaluate 
-@result: result
-@output: returns 0 if no error
-**/ 
-int poly_eval(uint8_t * poly, uint8_t k, uint8_t x, uint8_t * result);
-
 #endif

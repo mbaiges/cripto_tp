@@ -2,42 +2,30 @@
 #include <stdio.h>
 #include <galois.h>
 
-#include <bmp_handler.h>
+#include <arguments.h>
+#include <secret.h>
+// #include <bmp_handler.h>
+
+static uint16_t POLY_GEN = 0x163;
+
+static int (* secret_funcs[])(char *, uint8_t, char *) = {distribute_secret, recover_secret};
 
 int main(int argc, char ** argv) {
 
-    image_composition img_comp;
-
     int res;
+    args_st args;
 
-    res = load_image("images/Albert.bmp", &img_comp);
-    if (res != 0) {
-        exit(EXIT_FAILURE);
-    }
-    
-    size_t xwvu_size;
-    xwvu * xwvu_arr;
-
-    // res = pixels_to_xwvu(pixels, 48, &xwvu_arr, &xwvu_size, 6, 8);
-    res = pixels_to_xwvu(img_comp.pixels, img_comp.pixels_size, &xwvu_arr, &xwvu_size, img_comp.header.image_width, img_comp.header.image_height);
-
-    size_t new_pixels_size;
-    uint8_t * new_pixels_arr;
-
-    res = xwvu_to_pixels(xwvu_arr, xwvu_size, &new_pixels_arr, &new_pixels_size, img_comp.header.image_width, img_comp.header.image_height);
-
-    free_pixels_array(img_comp.pixels);
-
-    img_comp.pixels = new_pixels_arr;
-
-    free_xwvu_array(xwvu_arr);
-
-    res = save_image("images/Albertito.bmp", &img_comp);
+    res = parse_arguments(argc-1, &argv[1], &args);
     if (res != 0) {
         exit(EXIT_FAILURE);
     }
 
-    free_image_composition(&img_comp);
+    galois_init(POLY_GEN);
+
+    res = secret_funcs[args.op](args.secret_filename, args.k, args.shades_directory);
+    if (res != 0) {
+        exit(EXIT_FAILURE);
+    }
 
     exit(EXIT_SUCCESS);
 }

@@ -77,10 +77,25 @@ int poly_div_scalar(uint8_t * poly, size_t poly_g, uint8_t scalar, uint8_t * res
 }
 
 int poly_eval(uint8_t * poly, size_t poly_g, uint8_t x, uint8_t * result) {
+
+    uint8_t res = poly[0];
+
+    if (poly_g > 1) {
+        uint8_t x_term = x;
+        res = gadd(res, gmul(poly[1], x_term));
+
+        for(size_t i = 2; i < poly_g ; i++) {
+            x_term = gmul(x_term, x);
+            res = gadd(res, gmul(poly[i], x_term));
+        }
+    }
+
+    *result = res;
+
     return 0;
 }
 
-int lagrange_interpolate(uint8_t tuples[][2], size_t k, uint8_t * poly) {
+int lagrange_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
     
     setvbuf(stdout, NULL, _IONBF, 0);
 
@@ -108,7 +123,7 @@ int lagrange_interpolate(uint8_t tuples[][2], size_t k, uint8_t * poly) {
     for(size_t i =0; i < k; i++){
         printf("i = %ld\n", i);
 
-        x_i = tuples[i][0];
+        x_i = x[i];
 
         memset((void *) poly_mult_acum, 0, k * sizeof(uint8_t));
         poly_mult_empty = 1;
@@ -116,7 +131,7 @@ int lagrange_interpolate(uint8_t tuples[][2], size_t k, uint8_t * poly) {
     
         for(size_t j = 0; j < k; j++){
             printf("j = %ld\n", j);
-            x_j = tuples[j][0];
+            x_j = x[j];
 
             // L(t) = (t-x_j)/(x_i-x_j)
             if (j != i) {
@@ -173,7 +188,7 @@ int lagrange_interpolate(uint8_t tuples[][2], size_t k, uint8_t * poly) {
     memset((void *) poly_sum_acum, 0, k * sizeof(uint8_t));
 
     for(size_t i=0; i<k; i++) {
-        y_i = tuples[i][1];
+        y_i = y[i];
 
         res = poly_div_scalar(L[i], k, y_i, poly_aux2);
         if (res != 0) {

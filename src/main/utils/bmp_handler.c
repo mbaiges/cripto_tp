@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <dirent.h>
 
 #include <bmp_handler.h>
 
@@ -58,17 +59,18 @@ void print_image(uint8_t * pixels, unsigned int width, unsigned int height) {
     }
 }
 
-int load_image(const char * filename, image_composition * img_comp) {
+int load_image(const char * filepath, image_composition * img_comp) {
     
     FILE *fp;
 
-    fp = fopen(filename, "rb");
+    fp = fopen(filepath, "rb");
 
     if (fp == NULL){
-        perror("Error while opening the file.\n");
-        // exit(EXIT_FAILURE);
-        return 1;
+        perror("error while opening the file");
+        return -1;
     }
+
+    strcpy(img_comp->filepath, filepath);
 
     fseek(fp,0,0);
     fread(&(img_comp->header.file_signature[0]),1,1,fp);
@@ -88,16 +90,22 @@ int load_image(const char * filename, image_composition * img_comp) {
     fread(&(img_comp->header.image_colors_used),1,4,fp);
     fread(&(img_comp->header.image_important_colors),1,4,fp);
     
-    size_t fill_size = img_comp->header.data_offset-54;
-    img_comp->fill = malloc(fill_size * sizeof(uint8_t));
-    fread(img_comp->fill,1,fill_size,fp);
+    size_t colors_table_size = img_comp->header.data_offset-54;
+    img_comp->colors_table = malloc(colors_table_size * sizeof(uint8_t));
+    fread(img_comp->colors_table,1,colors_table_size,fp);
     
     // TODO: Que hacemos con lo que hay entre 54 Bytes y el Offset
 
     fseek(fp, img_comp->header.data_offset, 0); // Pixels begin in offset 
-    
-    img_comp->pixels = malloc(img_comp->header.image_size * sizeof(uint8_t));
-    fread(img_comp->pixels,1,img_comp->header.image_size,fp);
+
+    //TODO: Revisar porque a veces viene 0 de image_size ...
+    // img_comp->pixels_size = img_comp->header.image_size; 
+    //Solucion
+    img_comp->pixels_size = img_comp->header.image_width * img_comp->header.image_height;
+    img_comp->header.image_size = img_comp->pixels_size;
+
+    img_comp->pixels = malloc(img_comp->pixels_size * sizeof(uint8_t));
+    fread(img_comp->pixels,1,img_comp->pixels_size,fp);
 
     // print_header(&(img_comp->header));
     // print_image(img_comp->pixels, img_comp->header.image_width, img_comp->header.image_height);
@@ -107,20 +115,57 @@ int load_image(const char * filename, image_composition * img_comp) {
     return 0;
 }
 
-int load_images(char ** filenames, image_composition ** imgs_comp, size_t * imgs_comp_size) {
-    // for(size_t i = 0 ; i < imgs_comp_size ; i++) {
-    //     if (load_image(filename[i], imgs_comp[i]) != 0) 
-    //         return -1;
-    // }
+int load_images(char *directory, image_composition ** imgs_comp, size_t * imgs_comp_size) {
+
+    char filepath[MAX_FILEPATH_LENGTH];
+
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(directory);
+
+    if(d) {
+        image_composition * images = NULL;
+        size_t dir_len = strlen(directory);
+        strcpy(filepath, directory);
+        filepath[dir_len] = '/';
+        size_t max_filename_len = MAX_FILEPATH_LENGTH - (dir_len + 1);
+        size_t cant_imgs = 0;
+
+        while ((dir = readdir(d)) != NULL) {
+            if (dir->d_type == DT_REG) {  // If the entry is a regular file 
+                if(strlen(dir->d_name) >= max_filename_len) {
+                    return 1;
+                }
+                cant_imgs++;
+                images = (image_composition *) realloc(images, cant_imgs * sizeof(image_composition));
+                if (images == NULL) {
+                    return 1;
+                }
+                strcpy(filepath + dir_len + 1, dir->d_name);
+                
+                int result = load_image(filepath, &(images[cant_imgs-1]));
+
+                if(result != 0) {
+                    return 1;
+                }
+            }
+        }
+        closedir(d);
+        *imgs_comp = images;
+        *imgs_comp_size = cant_imgs;
+    }
+    else {
+        return 1;
+    }
 
     return 0;
 }
 
-int save_image(const char * filename, image_composition * img_comp) {
+int save_image(image_composition * img_comp) {
     
     FILE *fp;
 
-    fp = fopen(filename, "wb");
+    fp = fopen(img_comp->filepath, "wb");
 
     if (fp == NULL){
         perror("Error while opening the file.\n");
@@ -145,8 +190,8 @@ int save_image(const char * filename, image_composition * img_comp) {
     fwrite(&(img_comp->header.image_colors_used),1,4,fp);
     fwrite(&(img_comp->header.image_important_colors),1,4,fp);
 
-    size_t fill_size = img_comp->header.data_offset-54;
-    fwrite(img_comp->fill,1,fill_size,fp);
+    size_t colors_table_size = img_comp->header.data_offset-54;
+    fwrite(img_comp->colors_table,1,colors_table_size,fp);
     
     // TODO: Que hacemos con lo que hay entre 54 Bytes y el Offset --> por ahora le cambiamos el offset a 54B 
 
@@ -156,9 +201,9 @@ int save_image(const char * filename, image_composition * img_comp) {
     return 0;
 }
 
-int save_images(char ** filenames, image_composition ** imgs_comp, size_t imgs_comp_size) {
+int save_images(image_composition * imgs_comp, size_t imgs_comp_size) {
     for(size_t i = 0 ; i < imgs_comp_size ; i++) {
-        if (save_image(filenames[i], imgs_comp[i]) != 0)
+        if (save_image(&(imgs_comp[i])) != 0)
             return -1;
     }
 
@@ -252,13 +297,14 @@ int xwvu_to_pixels(xwvu * xwvu_array, size_t xwvu_array_size, uint8_t ** pixels,
 
 void free_image_composition(image_composition * img_comp) {
     free_pixels_array(img_comp->pixels);
-    free(img_comp->fill);
+    free(img_comp->colors_table);
 }
 
-void free_images_composition(image_composition ** imgs_comp, size_t * imgs_comp_size) {
-    for (int i=0; i < (int) *imgs_comp_size; i++) {
-        free_image_composition(imgs_comp[i]);
+void free_images_composition(image_composition * imgs_comp, size_t imgs_comp_size) {
+    for (int i=0; i < (int) imgs_comp_size; i++) {
+        free_image_composition(&(imgs_comp[i]));
     }
+    free(imgs_comp);
 }
 
 void free_xwvu_array(xwvu * xwvu_array) {
