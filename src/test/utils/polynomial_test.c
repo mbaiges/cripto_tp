@@ -154,7 +154,7 @@ START_TEST(test_polynomial_interpolation)
     size_t poly_res_size = sizeof(x)/sizeof(x[0]);
     uint8_t poly_res[poly_res_size];
 
-    res = interpolate(x, y, poly_res_size, poly_res);
+    res = poly_interpolate(x, y, poly_res_size, poly_res);
     
     ck_assert_uint_eq(0, res);
 
@@ -171,7 +171,7 @@ START_TEST(test_polynomial_interpolation)
     size_t poly2_res_size = sizeof(x2)/sizeof(x2[0]);
     uint8_t poly2_res[poly2_res_size];
 
-    res2 = interpolate(x2, y2, poly2_res_size, poly2_res);
+    res2 = poly_interpolate(x2, y2, poly2_res_size, poly2_res);
     
     ck_assert_uint_eq(0, res2);
 

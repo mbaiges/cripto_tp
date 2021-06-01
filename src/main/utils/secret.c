@@ -100,14 +100,14 @@ int distribute_secret(char * secret_filename, uint8_t k, char * shades_directory
  
             // Distribute pixels --> set bits w:3 v:3 u:pad+2
             // w
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].w), 2, bits[0]);
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].w), 1, bits[1]);
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].w), 0, bits[2]);
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].w), 2, bits[7]);
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].w), 1, bits[6]);
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].w), 0, bits[5]);
 
             // v
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].v), 2, bits[3]);
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].v), 1, bits[4]);
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].v), 0, bits[5]);
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].v), 2, bits[4]);
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].v), 1, bits[3]);
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].v), 0, bits[2]);
 
             // u
             uint8_t pad = bits[0]; 
@@ -115,8 +115,8 @@ int distribute_secret(char * secret_filename, uint8_t k, char * shades_directory
                 pad ^= bits[b]; 
             }
             change_bit(&(imgs_xwvu_arr[j][xwvu_idx].u), 2, pad);
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].u), 1, bits[6]);
-            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].u), 0, bits[7]);          
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].u), 1, bits[1]);
+            change_bit(&(imgs_xwvu_arr[j][xwvu_idx].u), 0, bits[0]);          
         }     
     }
 
@@ -170,8 +170,8 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
     }
 
     // Interpolation 
-    uint8_t * coeffs;
-    uint8_t * pixels; 
+    uint8_t coeffs[k];
+    uint8_t pixels[k*xwvu_size]; 
 
     uint8_t x[k];
     uint8_t y[k];
@@ -183,18 +183,18 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
             uint8_t bits[8] = {0};
 
             // w
-            bits[0] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 2);
-            bits[1] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 1);
-            bits[2] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 0);
+            bits[7] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 2);
+            bits[6] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 1);
+            bits[5] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 0);
 
             // v
-            bits[3] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 2);
-            bits[4] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 1);
-            bits[5] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 0); 
+            bits[4] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 2);
+            bits[3] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 1);
+            bits[2] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 0); 
 
             // u
-            bits[6] = CHECK_BIT(imgs_xwvu_arr[img][i].u, 1);
-            bits[7] = CHECK_BIT(imgs_xwvu_arr[img][i].u, 0);
+            bits[1] = CHECK_BIT(imgs_xwvu_arr[img][i].u, 1);
+            bits[0] = CHECK_BIT(imgs_xwvu_arr[img][i].u, 0);
 
             uint8_t pad; 
             for (int b=0; b<8; b++) {
@@ -204,8 +204,8 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
             uint8_t read_pad = CHECK_BIT(imgs_xwvu_arr[img][i].u, 2);
 
             if (pad != read_pad) {
-                fprintf(stderr, "error: checksum pad failed");
-                return 1;
+                fprintf(stderr, "error: checksum pad failed\n");
+                // return 1;
             }
                 
             y[img] = 0;
@@ -214,29 +214,31 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
             }
         }
         
-        res = lagrange_interpolate(x, y, k, coeffs);
+        res = poly_interpolate(x, y, k, coeffs);
         if (res != 0 ){
             return 1; 
-        }               
-        memcpy(&(pixels[i]), coeffs, sizeof(coeffs[0]));
+        }
+        memcpy(&(pixels[i]), coeffs, k * sizeof(coeffs[0]));
     }
 
-    for(size_t i = 0 ; i< xwvu_size; i++){
-        free_xwvu_array(imgs_xwvu_arr[i]);
-    } 
+    // for(size_t i = 0 ; i< xwvu_size; i++){
+    //     free_xwvu_array(imgs_xwvu_arr[i]);
+    // } 
 
-    image_composition img_comp; 
+    image_composition img_comp;
 
-    free_pixels_array(img_comp.pixels);
+    memcpy(&img_comp, &(imgs_comp[0]), sizeof(img_comp));
+    img_comp.pixels = pixels;
 
-    img_comp.pixels = pixels;  
+    size_t secret_filename_len = strlen(secret_filename);
+    memcpy(img_comp.filepath, secret_filename, secret_filename_len);
+    img_comp.filepath[secret_filename_len] = '\0';
 
     res = save_image(&img_comp);
     if (res != 0) {
         return 1;
     }
 
-    free_image_composition(&img_comp);
     free_images_composition(imgs_comp, imgs_comp_size);
 
     return res; 

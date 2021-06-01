@@ -181,7 +181,7 @@
 //     return 0;
 // }
 
-int interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
+int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
 
     uint8_t upper;
     uint8_t bottom;
