@@ -1,110 +1,111 @@
 #include <stdlib.h>
 #include <check.h>
+#include <stdio.h>
 
 #include "../../main/utils/polynomial.c"
 #include "../../main/utils/galois.c"
 
 static uint16_t POLY_GEN = 0x163;
 
-START_TEST(test_polynomial_addition)
-{
-    galois_init(POLY_GEN);
+// START_TEST(test_polynomial_addition)
+// {
+//     galois_init(POLY_GEN);
 
-    uint8_t poly_res[10] = {0};
+//     uint8_t poly_res[10] = {0};
  
-    uint8_t poly1[] = {0, 0, 1, 0, 1, 0, 1}; // x^6+x^4+x^2
-    uint8_t poly2[] = {0, 0, 0, 1}; // x^3
+//     uint8_t poly1[] = {0, 0, 1, 0, 1, 0, 1}; // x^6+x^4+x^2
+//     uint8_t poly2[] = {0, 0, 0, 1}; // x^3
 
-    uint8_t expected_poly[] = {0, 0, 1, 1, 1, 0, 1};
+//     uint8_t expected_poly[] = {0, 0, 1, 1, 1, 0, 1};
 
-    int res;
+//     int res;
 
-    res = poly_add(poly1, 7, poly2, 4, poly_res);
+//     res = poly_add(poly1, 7, poly2, 4, poly_res);
     
-    ck_assert_uint_eq(0, res);
+//     ck_assert_uint_eq(0, res);
 
-    size_t poly_res_size = 7;
+//     size_t poly_res_size = 7;
 
-    for(size_t i = 0; i < poly_res_size; i++){
-        ck_assert_uint_eq(expected_poly[i], poly_res[i]);
-    }
-}
-END_TEST
+//     for(size_t i = 0; i < poly_res_size; i++){
+//         ck_assert_uint_eq(expected_poly[i], poly_res[i]);
+//     }
+// }
+// END_TEST
 
-START_TEST(test_polynomial_multiplication_by_scalar)
-{
-    galois_init(POLY_GEN);
+// START_TEST(test_polynomial_multiplication_by_scalar)
+// {
+//     galois_init(POLY_GEN);
 
-    uint8_t poly1[] = {0, 0, 4, 0, 200, 0, 5};
-    uint8_t scalar = 2;
+//     uint8_t poly1[] = {0, 0, 4, 0, 200, 0, 5};
+//     uint8_t scalar = 2;
 
-    uint8_t poly_res[7] = {0};
+//     uint8_t poly_res[7] = {0};
 
-    uint8_t expected_poly[] = {0, 0, 8, 0, 243, 0, 10};
+//     uint8_t expected_poly[] = {0, 0, 8, 0, 243, 0, 10};
 
-    int res;
+//     int res;
 
-    res = poly_mult_scalar(poly1, 7, scalar, poly_res);
+//     res = poly_mult_scalar(poly1, 7, scalar, poly_res);
     
-    ck_assert_uint_eq(0, res);
+//     ck_assert_uint_eq(0, res);
 
-    size_t poly_res_size = 7;
+//     size_t poly_res_size = 7;
 
-    for(size_t i = 0; i < poly_res_size; i++){
-        ck_assert_uint_eq(expected_poly[i], poly_res[i]);
-    }
-}
-END_TEST
+//     for(size_t i = 0; i < poly_res_size; i++){
+//         ck_assert_uint_eq(expected_poly[i], poly_res[i]);
+//     }
+// }
+// END_TEST
 
-START_TEST(test_polynomial_division_by_scalar)
-{
-    galois_init(POLY_GEN);
+// START_TEST(test_polynomial_division_by_scalar)
+// {
+//     galois_init(POLY_GEN);
 
-    uint8_t poly1[] = {0, 0, 8, 0, 243, 0, 10};
-    uint8_t scalar = 2;
+//     uint8_t poly1[] = {0, 0, 8, 0, 243, 0, 10};
+//     uint8_t scalar = 2;
 
-    uint8_t poly_res[7] = {0};
+//     uint8_t poly_res[7] = {0};
 
-    uint8_t expected_poly[] = {0, 0, 4, 0, 200, 0, 5};
+//     uint8_t expected_poly[] = {0, 0, 4, 0, 200, 0, 5};
 
-    int res;
+//     int res;
 
-    res = poly_div_scalar(poly1, 7, scalar, poly_res);
+//     res = poly_div_scalar(poly1, 7, scalar, poly_res);
     
-    ck_assert_uint_eq(0, res);
+//     ck_assert_uint_eq(0, res);
 
-    size_t poly_res_size = 7;
+//     size_t poly_res_size = 7;
 
-    for(size_t i = 0; i < poly_res_size; i++){
-        ck_assert_uint_eq(expected_poly[i], poly_res[i]);
-    }
-}
-END_TEST
+//     for(size_t i = 0; i < poly_res_size; i++){
+//         ck_assert_uint_eq(expected_poly[i], poly_res[i]);
+//     }
+// }
+// END_TEST
 
-START_TEST(test_polynomial_multiplication)
-{
-    galois_init(POLY_GEN);
+// START_TEST(test_polynomial_multiplication)
+// {
+//     galois_init(POLY_GEN);
 
-    uint8_t poly_res[10] = {0};
+//     uint8_t poly_res[10] = {0};
  
-    uint8_t poly1[] = {0, 0, 1, 0, 1, 0, 1}; // x^6+x^4+x^2
-    uint8_t poly2[] = {0, 0, 0, 1}; // x^3
+//     uint8_t poly1[] = {0, 0, 1, 0, 1, 0, 1}; // x^6+x^4+x^2
+//     uint8_t poly2[] = {0, 0, 0, 1}; // x^3
 
-    uint8_t expected_poly[] = {0, 0, 0, 0, 0, 1, 0, 1, 0, 1}; // x^9+x^7+x^5
+//     uint8_t expected_poly[] = {0, 0, 0, 0, 0, 1, 0, 1, 0, 1}; // x^9+x^7+x^5
 
-    int res;
+//     int res;
 
-    res = poly_mult(poly1, 7, poly2, 4, poly_res);
+//     res = poly_mult(poly1, 7, poly2, 4, poly_res);
     
-    ck_assert_uint_eq(0, res);
+//     ck_assert_uint_eq(0, res);
 
-    size_t poly_res_size = (7-1)+(4-1)+1;
+//     size_t poly_res_size = (7-1)+(4-1)+1;
 
-    for(size_t i = 0; i < poly_res_size; i++){
-        ck_assert_uint_eq(expected_poly[i], poly_res[i]);
-    }
-}
-END_TEST
+//     for(size_t i = 0; i < poly_res_size; i++){
+//         ck_assert_uint_eq(expected_poly[i], poly_res[i]);
+//     }
+// }
+// END_TEST
 
 START_TEST(test_polynomial_eval)
 {
@@ -140,27 +141,42 @@ START_TEST(test_polynomial_eval)
 }
 END_TEST
 
-START_TEST(test_polynomial_lagrange_interpolation)
+START_TEST(test_polynomial_interpolation)
 {
     galois_init(POLY_GEN);
 
-    uint8_t poly[] = {20, 40, 60};
-    uint8_t x[] = {100, 200, 20};
-
-    uint8_t y[] = {123, 90, 238};
-
-    uint8_t poly_res[3] = {0};
+    uint8_t poly[] = {2, 4};
+    uint8_t x[] = {255, 254};
+    uint8_t y[] = {91, 95};
 
     int res;
 
-    res = lagrange_interpolate(x, y, 3, poly_res);
+    size_t poly_res_size = sizeof(x)/sizeof(x[0]);
+    uint8_t poly_res[poly_res_size];
+
+    res = interpolate(x, y, poly_res_size, poly_res);
     
     ck_assert_uint_eq(0, res);
 
-    size_t poly_res_size = 3;
-
     for(size_t i = 0; i < poly_res_size; i++){
         ck_assert_uint_eq(poly[i], poly_res[i]);
+    }
+
+    uint8_t poly2[] = {8, 3, 0, 1, 220, 255, 188, 101};
+    uint8_t x2[] = {255, 254, 200, 40, 100, 126, 127, 99};
+    uint8_t y2[] = {207, 102,  63, 148, 103,  86,  36,  77};
+
+    int res2;
+
+    size_t poly2_res_size = sizeof(x2)/sizeof(x2[0]);
+    uint8_t poly2_res[poly2_res_size];
+
+    res2 = interpolate(x2, y2, poly2_res_size, poly2_res);
+    
+    ck_assert_uint_eq(0, res2);
+
+    for(size_t i = 0; i < poly2_res_size; i++){
+        ck_assert_uint_eq(poly2[i], poly2_res[i]);
     }
 }
 END_TEST
@@ -171,12 +187,12 @@ suite(void)
     Suite *s = suite_create("polynomial");
     TCase *tc = tcase_create("polynomial");
 
-    tcase_add_test(tc, test_polynomial_addition);
-    tcase_add_test(tc, test_polynomial_multiplication_by_scalar);
-    tcase_add_test(tc, test_polynomial_division_by_scalar);
-    tcase_add_test(tc, test_polynomial_multiplication);
+    // tcase_add_test(tc, test_polynomial_addition);
+    // tcase_add_test(tc, test_polynomial_multiplication_by_scalar);
+    // tcase_add_test(tc, test_polynomial_division_by_scalar);
+    // tcase_add_test(tc, test_polynomial_multiplication);
     tcase_add_test(tc, test_polynomial_eval);
-    tcase_add_test(tc, test_polynomial_lagrange_interpolation);
+    tcase_add_test(tc, test_polynomial_interpolation);
     suite_add_tcase(s, tc);
 
     return s;
