@@ -33,7 +33,7 @@ static void change_bit(uint8_t * x, uint8_t pos, uint8_t bit) {
 
 static uint8_t get_x(uint8_t x, uint8_t * used) {
     uint8_t new_x = x;
-    while(used[new_x]) {
+    while(new_x == 0 || used[new_x]) {
         new_x++;
     }
     return new_x;
@@ -90,6 +90,7 @@ int distribute_secret(char * secret_filename, uint8_t k, char * shades_directory
         for(size_t j=0; j < imgs_comp_size; j++){
             // Si se repite el x no usarlo
             imgs_xwvu_arr[j][xwvu_idx].x = get_x(imgs_xwvu_arr[j][xwvu_idx].x, used);
+            used[imgs_xwvu_arr[j][xwvu_idx].x] = 1;
 
             res = poly_eval(coeffs, k, imgs_xwvu_arr[j][xwvu_idx].x, &result); 
             if (res != 0 ){

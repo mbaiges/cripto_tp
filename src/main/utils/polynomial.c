@@ -207,6 +207,9 @@ int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
             if (j != i) {
                 upper = gsub(0, x[j]);
                 bottom = gsub(x[i], x[j]);
+                if (bottom == 0) {
+                    fprintf(stderr, "DIVISION BY ZERO: %d - %d\n", x[i], x[j]);
+                }
                 aux = gdiv(upper, bottom);
 
                 if (acum_empty) {
@@ -246,6 +249,9 @@ int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
             for(size_t i=0; i<k; i++) {
                 upper = gsub(Y[j][i], s[j]);
                 bottom = x[i];
+                if (bottom == 0) {
+                    fprintf(stderr, "DIVISION BY ZERO: %d\n", bottom);
+                }
                 aux = gdiv(upper, bottom);
 
                 Y[j+1][i] = aux;

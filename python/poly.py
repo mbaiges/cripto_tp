@@ -3,13 +3,13 @@ import numpy as np
 
 GF = galois.GF(2**8, irreducible_poly=galois.Poly.Degrees([8, 6, 5, 1, 0]));
 
-poly_coeffs = [2, 4, 250, 30];
+poly_coeffs = [0, 255, 10];
 
 p = galois.Poly(poly_coeffs, order="asc", field=GF);
 
-x = [255, 254, 200, 40];
+x = [255, 1, 2];
 
-print(f'p={p}');
+print(f'p={poly_coeffs}');
 print(f'x={x}');
 
 y = p(x);
@@ -128,7 +128,7 @@ def interpolate(x, y):
             else:
                 acum = add(acum, aux);
 
-        s[j] = acum;
+        s[j] = acum[0];
 
         if j < len(x) - 1:
             for i in range(0, len(x)):
@@ -136,14 +136,27 @@ def interpolate(x, y):
                 bot = [x[i]];
                 aux = div(upper, bot);
 
-                Y[j+1][i] = aux;
+                Y[j+1][i] = aux[0];
 
     return s;
 
-res1 = lagrange_interpolate(x, y_list);
+# res1 = lagrange_interpolate(x, y_list);
 
-print(f'res1={res1}');
+# print(f'res1={res1}');
 
 res2 = interpolate(x, y_list);
+
+for coef in range(0, 1<<8):
+    poly_coeffs = [coef, (coef + 1)%256, (coef + 2)%256];
+    p = galois.Poly(poly_coeffs, order="asc", field=GF);
+    print(f'################### Coeffs={poly_coeffs} ###################')
+    for equis in range(1, 1<<8-2):
+        x = [equis, (equis + 1)%256, (equis + 2)%256]
+        y = p(x);
+        y_list = y.view(np.ndarray);
+        coeffs = interpolate(x, y_list)
+
+        if poly_coeffs != coeffs:
+            print(f'x={equis} ==> coeffs={coeffs}')
 
 print(f'res2={res2}');

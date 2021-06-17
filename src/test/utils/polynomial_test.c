@@ -178,6 +178,23 @@ START_TEST(test_polynomial_interpolation)
     for(size_t i = 0; i < poly2_res_size; i++){
         ck_assert_uint_eq(poly2[i], poly2_res[i]);
     }
+
+    uint8_t poly3[] = {1, 255, 10};
+    uint8_t x3[] = {1, 2, 3};
+    uint8_t y3[] = {244, 180, 65};
+
+    int res3;
+
+    size_t poly3_res_size = sizeof(x3)/sizeof(x3[0]);
+    uint8_t poly3_res[poly3_res_size];
+
+    res3 = poly_interpolate(x3, y3, poly3_res_size, poly3_res);
+    
+    ck_assert_uint_eq(0, res3);
+
+    for(size_t i = 0; i < poly3_res_size; i++){
+        ck_assert_uint_eq(poly3[i], poly3_res[i]);
+    }
 }
 END_TEST
 
