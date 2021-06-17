@@ -31,6 +31,14 @@ static void change_bit(uint8_t * x, uint8_t pos, uint8_t bit) {
     }
 }
 
+static uint8_t get_x(uint8_t x, uint8_t * used) {
+    uint8_t new_x = x;
+    while(used[new_x]) {
+        new_x++;
+    }
+    return new_x;
+}
+
 int distribute_secret(char * secret_filename, uint8_t k, char * shades_directory){
     
     image_composition img_comp;
@@ -67,15 +75,22 @@ int distribute_secret(char * secret_filename, uint8_t k, char * shades_directory
     uint8_t result;
     int xwvu_idx;
 
+    uint8_t used[1<<8];
+
     for(size_t i = 0; i < img_comp.pixels_size; i+=k){
         xwvu_idx = (int) i/k;
+
+        // Reset used array
+        memset(used, 0, sizeof(used)/(sizeof(used[0])));
 
         // Build F(x)
         memcpy(coeffs, &img_comp.pixels[i], k*sizeof(img_comp.pixels[0])); //Get coeffs from i to i+k
 
         // Get Y=F(x from xwvu) 
         for(size_t j=0; j < imgs_comp_size; j++){
-            //TODO si se repite el x no usarlo 
+            // Si se repite el x no usarlo
+            imgs_xwvu_arr[j][xwvu_idx].x = get_x(imgs_xwvu_arr[j][xwvu_idx].x, used);
+
             res = poly_eval(coeffs, k, imgs_xwvu_arr[j][xwvu_idx].x, &result); 
             if (res != 0 ){
                 return 1; 
@@ -183,29 +198,31 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
             uint8_t bits[8] = {0};
 
             // w
-            bits[7] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 2);
-            bits[6] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 1);
-            bits[5] = CHECK_BIT(imgs_xwvu_arr[img][i].w, 0);
+            bits[7] = GET_BIT(imgs_xwvu_arr[img][i].w, 2);
+            bits[6] = GET_BIT(imgs_xwvu_arr[img][i].w, 1);
+            bits[5] = GET_BIT(imgs_xwvu_arr[img][i].w, 0);
 
             // v
-            bits[4] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 2);
-            bits[3] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 1);
-            bits[2] = CHECK_BIT(imgs_xwvu_arr[img][i].v, 0); 
+            bits[4] = GET_BIT(imgs_xwvu_arr[img][i].v, 2);
+            bits[3] = GET_BIT(imgs_xwvu_arr[img][i].v, 1);
+            bits[2] = GET_BIT(imgs_xwvu_arr[img][i].v, 0); 
 
             // u
-            bits[1] = CHECK_BIT(imgs_xwvu_arr[img][i].u, 1);
-            bits[0] = CHECK_BIT(imgs_xwvu_arr[img][i].u, 0);
+            bits[1] = GET_BIT(imgs_xwvu_arr[img][i].u, 1);
+            bits[0] = GET_BIT(imgs_xwvu_arr[img][i].u, 0);
 
-            uint8_t pad; 
+            uint8_t pad = 0; 
             for (int b=0; b<8; b++) {
                 pad ^= bits[b]; 
             }
+            pad = GET_BIT(pad, 0);
 
-            uint8_t read_pad = CHECK_BIT(imgs_xwvu_arr[img][i].u, 2);
+            uint8_t read_pad = 0;
+            read_pad = GET_BIT(imgs_xwvu_arr[img][i].u, 2);
 
             if (pad != read_pad) {
                 fprintf(stderr, "error: checksum pad failed\n");
-                // return 1;
+                return 1;
             }
                 
             y[img] = 0;
@@ -218,7 +235,7 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
         if (res != 0 ){
             return 1; 
         }
-        memcpy(&(pixels[i]), coeffs, k * sizeof(coeffs[0]));
+        memcpy(&(pixels[i*k]), coeffs, k * sizeof(coeffs[0]));
     }
 
     // for(size_t i = 0 ; i< xwvu_size; i++){
