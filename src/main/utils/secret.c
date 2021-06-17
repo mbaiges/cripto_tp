@@ -239,9 +239,9 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
         memcpy(&(pixels[i*k]), coeffs, k * sizeof(coeffs[0]));
     }
 
-    // for(size_t i = 0 ; i< xwvu_size; i++){
-    //     free_xwvu_array(imgs_xwvu_arr[i]);
-    // } 
+    for(size_t i = 0 ; i< imgs_comp_size; i++){
+        free_xwvu_array(imgs_xwvu_arr[i]);
+    } 
 
     image_composition img_comp;
 
