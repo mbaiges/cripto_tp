@@ -2,6 +2,7 @@
 #include <string.h>
 #include <bmp_handler.h>
 #include <polynomial.h>
+#include <stdbool.h>
 
 #include <secret.h> 
 
@@ -97,17 +98,6 @@ int distribute_secret(char * secret_filename, uint8_t k, char * shades_directory
                 return 1; 
             }
 
-            // printf("coeffs: [");
-            // for (int i=0; i<k; i++) {
-            //     printf("%d", coeffs[i]);
-            //     if (i < k - 1) {
-            //         printf(", ");
-            //     }
-            // }
-            // printf("]\n");
-            // printf("x: %d\n", imgs_xwvu_arr[j][xwvu_idx].x);
-            // printf("result: %d\n", result);
-
             uint8_t bits[8] = {0};
 
             for (int b=0; b<8; b++) {
@@ -192,7 +182,11 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
     uint8_t x[k];
     uint8_t y[k];
 
-    for(size_t i = 0; i < xwvu_size; i++){
+    size_t l = (imgs_comp[0].header.image_width * imgs_comp[0].header.image_height)/k;
+
+    bool errored = false;
+
+    for(size_t i = 0; i < l; i++){
         for(size_t img = 0; img < k; img++){  
             x[img] = imgs_xwvu_arr[img][i].x;
 
@@ -222,15 +216,19 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
             read_pad = GET_BIT(imgs_xwvu_arr[img][i].u, 2);
 
             if (pad != read_pad) {
-                printf("pad=%d, read_pad=%d\n", pad, read_pad);
                 fprintf(stderr, "error: checksum pad failed\n");
-                // return 1;
+                errored = true;
+                break;
             }
                 
             y[img] = 0;
             for (int b=0; b<8; b++) {
                 change_bit(&(y[img]), b, bits[b]); 
             }
+        }
+
+        if (errored) {
+            break;
         }
         
         res = poly_interpolate(x, y, k, coeffs);
@@ -242,20 +240,22 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
 
     for(size_t i = 0 ; i< imgs_comp_size; i++){
         free_xwvu_array(imgs_xwvu_arr[i]);
-    } 
+    }
 
-    image_composition img_comp;
+    if (!errored) {
+        image_composition img_comp;
 
-    memcpy(&img_comp, &(imgs_comp[0]), sizeof(img_comp));
-    img_comp.pixels = pixels;
+        memcpy(&img_comp, &(imgs_comp[0]), sizeof(img_comp));
+        img_comp.pixels = pixels;
 
-    size_t secret_filename_len = strlen(secret_filename);
-    memcpy(img_comp.filepath, secret_filename, secret_filename_len);
-    img_comp.filepath[secret_filename_len] = '\0';
+        size_t secret_filename_len = strlen(secret_filename);
+        memcpy(img_comp.filepath, secret_filename, secret_filename_len);
+        img_comp.filepath[secret_filename_len] = '\0';
 
-    res = save_image(&img_comp);
-    if (res != 0) {
-        return 1;
+        res = save_image(&img_comp);
+        if (res != 0) {
+            return 1;
+        }
     }
 
     free_images_composition(imgs_comp, imgs_comp_size);

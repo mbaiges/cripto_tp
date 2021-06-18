@@ -66,11 +66,11 @@ int parse_arguments(int argc, char ** argv, args_st * args) {
     bool valid_number = true;
 
     while (*aux) {
-        if (*aux < '0' && *aux > '9') {
+        if (*aux < '4' || *aux > '6') {
             valid_number = false;
             errored = true;
-            fprintf(stderr, "error: argument 3 must be a positive integer\n");
-            continue;
+            fprintf(stderr, "error: argument 3 must be 4, 5, or 6\n");
+            break;
         }
         aux++;
     }

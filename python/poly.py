@@ -104,7 +104,7 @@ def interpolate(x, y):
             aux_x, aux_y = x[0], y[0]
             x[0], y[0] = x[i], y[i]
             x[i], y[i] = aux_x, aux_y
-            continue
+            break
 
     Y = [ [ 0 for j in range(0, len(x)) ] for i in range(0, len(x)) ];
     Y[0] = y;
