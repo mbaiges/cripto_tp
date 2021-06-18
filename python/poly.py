@@ -106,9 +106,6 @@ def interpolate(x, y):
             x[i], y[i] = aux_x, aux_y
             break
 
-    Y = [ [ 0 for j in range(0, len(x)) ] for i in range(0, len(x)) ];
-    Y[0] = y;
-
     for j in range(0, len(x)-1):
         
         print(f'------ s_{j+1} ------\n')
@@ -141,14 +138,14 @@ def interpolate(x, y):
 
         st = ''
         for i in range(j, len(x)):
-            aux = mult(L0[i], [Y[j][i]])
+            aux = mult(L0[i], [y[i]])
 
             if acum is None:
                 acum = aux;
             else:
                 acum = add(acum, aux);
 
-            st += f'{L0[i]} x {Y[j][i]}'
+            st += f'{L0[i]} x {y[i]}'
             if i < len(x) - 1:
                 st += ' + '
 
@@ -160,15 +157,15 @@ def interpolate(x, y):
 
         if j < len(x) - 1:
             for i in range(j+1, len(x)):
-                upper = sub([Y[j][i]], [s[j]]);
+                upper = sub([y[i]], [s[j]]);
                 bot = [x[i]];
                 aux = div(upper, bot);
 
-                print(f'Y[{j+1}][{i}] = ({Y[j][i]} - {s[j]})/{x[i]} = {aux}')
+                print(f'Y[{j+1}][{i}] = ({y[i]} - {s[j]})/{x[i]} = {aux}')
 
-                Y[j+1][i] = aux[0];
+                y[i] = aux[0];
 
-    s[len(x)-1] = Y[len(x)-1][len(x)-1]
+    s[len(x)-1] = y[len(x)-1]
 
     return s;
 

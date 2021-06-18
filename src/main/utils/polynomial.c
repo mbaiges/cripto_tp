@@ -190,11 +190,8 @@ int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
     uint8_t L0[k];
     uint8_t s[k];
 
-    uint8_t Y[k][k];
-
     memset((void *) L0, 0, k*sizeof(uint8_t));
     memset((void *) s, 0, k*sizeof(uint8_t));
-    memset((void *) Y, 0, k*k*sizeof(uint8_t));
 
     int acum_empty;
     uint8_t acum;
@@ -221,10 +218,9 @@ int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
         }
     }
 
-    memcpy(Y[0], fixed_y, k * sizeof(fixed_y[0]));
-
     for(size_t j=0; j<k-1; j++) {
 
+        // L(0)
         for(size_t i =j; i < k; i++){
             acum_empty = 1;
             acum = 0;
@@ -255,7 +251,7 @@ int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
         acum = 0;
         
         for(size_t i=j; i<k; i++) {
-            aux = gmul(L0[i], Y[j][i]);
+            aux = gmul(L0[i], fixed_y[i]);
 
             if (acum_empty) {
                 acum_empty = 0;
@@ -270,18 +266,18 @@ int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
 
         if (j < k-1) {
             for(size_t i=j+1; i<k; i++) {
-                upper = gsub(Y[j][i], s[j]);
+                upper = gsub(fixed_y[i], s[j]);
                 bottom = fixed_x[i];
                 // if (bottom == 0) {
                 //     fprintf(stderr, "DIVISION BY ZERO: %d\n", bottom);
                 // }
                 aux = gdiv(upper, bottom);
 
-                Y[j+1][i] = aux;
+                fixed_y[i] = aux;
             }
         }
     }
-    s[k-1] = Y[k-1][k-1];
+    s[k-1] = fixed_y[k-1];
 
     memcpy(poly, s, k * sizeof(poly[0]));
 
