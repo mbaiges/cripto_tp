@@ -3,11 +3,11 @@ import numpy as np
 
 GF = galois.GF(2**8, irreducible_poly=galois.Poly.Degrees([8, 6, 5, 1, 0]));
 
-poly_coeffs = [0, 255, 10];
+poly_coeffs = [1, 255, 10];
 
 p = galois.Poly(poly_coeffs, order="asc", field=GF);
 
-x = [255, 1, 2];
+x = [1, 0, 2];
 
 print(f'p={poly_coeffs}');
 print(f'x={x}');
@@ -95,48 +95,80 @@ def div(pol1, pol2):
 #     return acum;
 
 def interpolate(x, y):
-    L1 = [[] for i in range(0, len(x))];
+    s = [0 for i in range(0, len(x))];
+
+    x, y = x.copy(), y.copy()
 
     for i in range(0, len(x)):
-        prod = None
-        for j in range(0, len(x)):
-            if i != j:
-                upper = sub([0], [x[j]]);
-                bot = sub([x[i]], [x[j]]);
-                aux = div(upper, bot);
-
-                if prod == None:
-                    prod = aux;
-                else:
-                    prod = mult(prod, aux);
-
-        L1[i] = prod;
-
-    s = [0 for i in range(0, len(x))];
+        if x[i] == 0:
+            aux_x, aux_y = x[0], y[0]
+            x[0], y[0] = x[i], y[i]
+            x[i], y[i] = aux_x, aux_y
+            continue
 
     Y = [ [ 0 for j in range(0, len(x)) ] for i in range(0, len(x)) ];
     Y[0] = y;
 
-    for j in range(0, len(x)):
+    for j in range(0, len(x)-1):
+        
+        print(f'------ s_{j+1} ------\n')
+
+        L0 = [[] for i in range(0, len(x))];
+
+        for i in range(j, len(x)):
+            prod = None
+            st = f'L0[{i}] = '
+            for k in range(j, len(x)):
+                if i != k:
+                    upper = sub([0], [x[k]]);
+                    bot = sub([x[i]], [x[k]]);
+                    aux = div(upper, bot);
+
+                    if prod == None:
+                        prod = aux;
+                    else:
+                        prod = mult(prod, aux);
+
+                    st += f'({x[k]} / ({x[i]} - {x[k]}))'
+                    st += ' x '
+        
+            L0[i] = prod;
+            print(st)
+
+        print(f'L(0) = {L0}')
+        
         acum = None;
 
-        for i in range(0, len(x)):
-            aux = mult(L1[i], [Y[j][i]])
+        st = ''
+        for i in range(j, len(x)):
+            aux = mult(L0[i], [Y[j][i]])
 
             if acum is None:
                 acum = aux;
             else:
                 acum = add(acum, aux);
 
+            st += f'{L0[i]} x {Y[j][i]}'
+            if i < len(x) - 1:
+                st += ' + '
+
+        print(st)
+        
         s[j] = acum[0];
 
+        print(f's[{j}] = {s[j]}')
+
         if j < len(x) - 1:
-            for i in range(0, len(x)):
+            for i in range(j+1, len(x)):
                 upper = sub([Y[j][i]], [s[j]]);
                 bot = [x[i]];
                 aux = div(upper, bot);
 
+                print(f'Y[{j+1}][{i}] = ({Y[j][i]} - {s[j]})/{x[i]} = {aux}')
+
                 Y[j+1][i] = aux[0];
+
+    s[len(x)-1] = Y[len(x)-1][len(x)-1]
 
     return s;
 
@@ -146,17 +178,17 @@ def interpolate(x, y):
 
 res2 = interpolate(x, y_list);
 
-for coef in range(0, 1<<8):
-    poly_coeffs = [coef, (coef + 1)%256, (coef + 2)%256];
-    p = galois.Poly(poly_coeffs, order="asc", field=GF);
-    print(f'################### Coeffs={poly_coeffs} ###################')
-    for equis in range(1, 1<<8-2):
-        x = [equis, (equis + 1)%256, (equis + 2)%256]
-        y = p(x);
-        y_list = y.view(np.ndarray);
-        coeffs = interpolate(x, y_list)
-
-        if poly_coeffs != coeffs:
-            print(f'x={equis} ==> coeffs={coeffs}')
-
 print(f'res2={res2}');
+
+# for coef in range(0, 1<<8):
+#     poly_coeffs = [coef, (coef + 1)%256, (coef + 2)%256];
+#     p = galois.Poly(poly_coeffs, order="asc", field=GF);
+#     print(f'################### Coeffs={poly_coeffs} ###################')
+#     for equis in range(1, 1<<8-2):
+#         x = [equis, (equis + 1)%256, (equis + 2)%256]
+#         y = p(x);
+#         y_list = y.view(np.ndarray);
+#         coeffs = interpolate(x, y_list)
+
+#         if poly_coeffs != coeffs:
+#             print(f'x={equis} ==> coeffs={coeffs}')

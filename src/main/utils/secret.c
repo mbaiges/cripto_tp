@@ -33,7 +33,7 @@ static void change_bit(uint8_t * x, uint8_t pos, uint8_t bit) {
 
 static uint8_t get_x(uint8_t x, uint8_t * used) {
     uint8_t new_x = x;
-    while(new_x == 0 || used[new_x]) {
+    while(used[new_x]) {
         new_x++;
     }
     return new_x;
@@ -222,8 +222,9 @@ int recover_secret(char * secret_filename, uint8_t k, char * shades_directory){
             read_pad = GET_BIT(imgs_xwvu_arr[img][i].u, 2);
 
             if (pad != read_pad) {
+                printf("pad=%d, read_pad=%d\n", pad, read_pad);
                 fprintf(stderr, "error: checksum pad failed\n");
-                return 1;
+                // return 1;
             }
                 
             y[img] = 0;
