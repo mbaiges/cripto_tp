@@ -16,11 +16,11 @@ Implementación en C de secreto compartido con esteganografía para ocultar una 
 ## Compilación
 1. Clonar el repositorio de la siguiente manera:
    ```bash
-   $> git clone https://github.com/mbaiges/cripto_tp.git
+   git clone https://github.com/mbaiges/cripto_tp.git
    ```
 2. Dentro de la carpeta raíz del proyecto ejecutar el siguiente comando para compilar:
    ```bash
-   $> make all
+   make all
    ```
 3. Una vez finalizada la compilación, el binario llamado `ss` se encontrará en la carpeta `./target/main` 
 
@@ -33,7 +33,7 @@ En primer lugar, tener preparado un directorio con las imágenes portadoras y, p
 
 Una vez hecho esto, ejecutar el siguiente comado:
 ```bash
-$> ./target/main/ss d <secret_image.bmp> <k> <shades_dir>
+./target/main/ss d <secret_image.bmp> <k> <shades_dir>
 ```
 Donde:
 - `<secret_image.bmp>` : path de la imagen a distribuir
@@ -46,7 +46,7 @@ Una vez ejecutado el comando, se habrán modificado las imágenes del directorio
 Para recuperar el secreto de un conjunto de imágenes dentro de un directorio, ejecutar el siguiente comando:
 
 ```bash
-$> ./target/main/ss r <recover.bmp> <k> <shades_dir>
+./target/main/ss r <recover.bmp> <k> <shades_dir>
 ```
 Donde:
 - `<recover.bmp>` : path donde se encontrará la imagen recuperada
