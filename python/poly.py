@@ -155,15 +155,14 @@ def interpolate(x, y):
 
         print(f's[{j}] = {s[j]}')
 
-        if j < len(x) - 1:
-            for i in range(j+1, len(x)):
-                upper = sub([y[i]], [s[j]]);
-                bot = [x[i]];
-                aux = div(upper, bot);
+        for i in range(j+1, len(x)):
+            upper = sub([y[i]], [s[j]]);
+            bot = [x[i]];
+            aux = div(upper, bot);
 
-                print(f'Y[{j+1}][{i}] = ({y[i]} - {s[j]})/{x[i]} = {aux}')
+            print(f'Y[{j+1}][{i}] = ({y[i]} - {s[j]})/{x[i]} = {aux}')
 
-                y[i] = aux[0];
+            y[i] = aux[0];
 
     s[len(x)-1] = y[len(x)-1]
 

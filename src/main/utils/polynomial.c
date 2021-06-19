@@ -264,17 +264,15 @@ int poly_interpolate(uint8_t * x, uint8_t * y, size_t k, uint8_t * poly) {
 
         s[j] = acum;
 
-        if (j < k-1) {
-            for(size_t i=j+1; i<k; i++) {
-                upper = gsub(fixed_y[i], s[j]);
-                bottom = fixed_x[i];
-                // if (bottom == 0) {
-                //     fprintf(stderr, "DIVISION BY ZERO: %d\n", bottom);
-                // }
-                aux = gdiv(upper, bottom);
+        for(size_t i=j+1; i<k; i++) {
+            upper = gsub(fixed_y[i], s[j]);
+            bottom = fixed_x[i];
+            // if (bottom == 0) {
+            //     fprintf(stderr, "DIVISION BY ZERO: %d\n", bottom);
+            // }
+            aux = gdiv(upper, bottom);
 
-                fixed_y[i] = aux;
-            }
+            fixed_y[i] = aux;
         }
     }
     s[k-1] = fixed_y[k-1];
