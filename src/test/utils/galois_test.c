@@ -297,8 +297,6 @@ START_TEST(galois_inv_mult_table_test)
         }
         ans2 = inv[x];
 
-        printf("it=%d\n", x);
-
         ck_assert_uint_eq(ans2, ans1);
     }
     uint8_t res = gf_invert(125, POLY_GEN);

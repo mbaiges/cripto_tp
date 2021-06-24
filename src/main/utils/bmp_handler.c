@@ -6,28 +6,6 @@
 
 #include <bmp_handler.h>
 
-void print_header(struct BMP_header * header) {
-
-    printf("file_signature=%c%c\n", header->file_signature[0], header->file_signature[1]);
-    printf("file_size=%u\n", header->file_size);
-    // printf("\treserved=%x", header->reserved);
-    printf("data_offset=%u\n", header->data_offset);
-    printf("header_size=%u\n", header->header_size);
-    printf("image_width=%u\n", header->image_width);
-    printf("image_height=%u\n", header->image_height);
-    printf("image_color_planes=%u\n", header->image_color_planes);
-    printf("image_bpp=%u\n", header->image_bpp);
-    printf("image_compression=%u\n", header->image_compression);
-    printf("image_size=%u\n", header->image_size);
-    printf("image_pixels_per_meter_X=%u\n", header->image_pixels_per_meter_X);
-    printf("image_pixels_per_meter_Y=%u\n", header->image_pixels_per_meter_Y);
-    printf("image_colors_used=%u\n", header->image_colors_used);
-    printf("image_important_colors=%u\n", header->image_important_colors);
-
-    printf("\n");
-
-}
-
 int load_image(const char * filepath, image_composition * img_comp) {
     
     FILE *fp;
@@ -75,9 +53,6 @@ int load_image(const char * filepath, image_composition * img_comp) {
 
     img_comp->pixels = malloc(img_comp->pixels_size * sizeof(uint8_t));
     fread(img_comp->pixels,1,img_comp->pixels_size,fp);
-
-    // print_header(&(img_comp->header));
-    // print_image(img_comp->pixels, img_comp->header.image_width, img_comp->header.image_height);
 
     fclose(fp);
 
