@@ -1,4 +1,4 @@
-# TPE Cripto. y Seg. 2021 1C.
+# TPE Criptografía y Seguridad 2021 1C
 
 Implementación en C de secreto compartido con esteganografía para ocultar una imágen secreta en K imágenes portadoras.
 
