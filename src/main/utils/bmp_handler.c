@@ -28,37 +28,6 @@ void print_header(struct BMP_header * header) {
 
 }
 
-void print_image(uint8_t * pixels, unsigned int width, unsigned int height) {
-
-    char matrix[height][width];
-
-    int i = 0;
-    int j = 0;
-
-    for (int it = (width*height)-1; it >= 0 ; it--) {
-        i = height - (it / width) - 1;
-        j = it % width;
-        
-        if (pixels[it] > (1<<7)) { // si el pixel está por encima de 128 (2^7)
-            matrix[i][j] = '+';
-        }
-        else {
-            matrix[i][j] = ' ';
-        }
-    }
-
-    char line[width+2];
-
-    for (unsigned int i=0; i < height; i++) {
-        for (unsigned int j=0; j < width; j++) {
-            line[j] = matrix[i][j];   
-        }
-        line[width] = '\n';
-        line[width+1] = '\0';
-        puts(line);
-    }
-}
-
 int load_image(const char * filepath, image_composition * img_comp) {
     
     FILE *fp;
@@ -122,6 +91,7 @@ int load_images(char *directory, image_composition ** imgs_comp, size_t * imgs_c
     DIR *d;
     struct dirent *dir;
     d = opendir(directory);
+    int error = 0;
 
     if(d) {
         image_composition * images = NULL;
@@ -146,7 +116,8 @@ int load_images(char *directory, image_composition ** imgs_comp, size_t * imgs_c
                 int result = load_image(filepath, &(images[cant_imgs-1]));
 
                 if(result != 0) {
-                    return 1;
+                    error = 1;
+                    break;
                 }
             }
         }
@@ -158,7 +129,7 @@ int load_images(char *directory, image_composition ** imgs_comp, size_t * imgs_c
         return 1;
     }
 
-    return 0;
+    return error;
 }
 
 int save_image(image_composition * img_comp) {
@@ -213,9 +184,14 @@ int save_images(image_composition * imgs_comp, size_t imgs_comp_size) {
 int pixels_to_xwvu(uint8_t * pixels, size_t pixels_size, xwvu ** xwvu_array, size_t * xwvu_array_size, size_t width, size_t height) {
 
     uint8_t matrix[height][width];
+    memset(matrix, 0, sizeof(uint8_t)*height*width);
 
     int i = 0;
     int j = 0;
+
+    if (width*height < 1) {
+        return 1;
+    }
 
     for (int it = (width*height)-1; it >= 0 ; it--) {
         i = height - (it / width) - 1;

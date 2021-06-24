@@ -56,6 +56,7 @@ int distribute_secret(char * secret_filename, uint8_t k, char * shades_directory
 
     res = load_images(shades_directory, &imgs_comp, &imgs_comp_size); 
     if (res != 0 ){
+        free_images_composition(imgs_comp, imgs_comp_size);
         return 1; 
     }
 
