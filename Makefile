@@ -2,8 +2,8 @@
 
 # extra: 
 # -fsanitize=address
-CFLAGS= -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-function -Wno-unused-parameter -fsanitize=address \
-                -pedantic -pedantic-errors -std=c99 -D_DEFAULT_SOURCE -g \
+CFLAGS= -Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-function -Wno-unused-parameter -Wno-unused-result \
+                -pedantic -pedantic-errors -std=c99 -D_DEFAULT_SOURCE -O3 -g \
                 $(MYCFLAGS)
 
 CTESTFLAGS= -lcheck -lm -lrt -lsubunit -pthread $(CFLAGS) $(MYCFLAGS)
